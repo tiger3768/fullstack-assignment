@@ -8,7 +8,7 @@ import com.ucubeinterview.timer.service.TimerService;
 
 @RestController
 @RequestMapping("/api/timer")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class TimerController {
     private final TimerService timerService;
 
