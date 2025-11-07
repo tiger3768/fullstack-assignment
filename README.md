@@ -1,363 +1,87 @@
-# ⏰ Countdown Timer Web App (Dockerized + Monitored)
+# Fullstack Engineer Online Assessment
 
-A full-stack **Countdown Timer** web application that allows users to:
+## Task Overview
 
-- Set a **counter name** and **target date/time**
-- Save timers to a **Spring Boot + MongoDB Atlas** backend
-- Display a **live countdown** (days, hours, minutes, seconds)
-- **Update** or **reset** the timer anytime
-- Handle all API/database errors gracefully
-- Expose **health and metrics endpoints** via Spring Boot Actuator
-- Run easily via **Docker Compose**
-- Fully **responsive** frontend built with React + Vite
+**Build a Countdown Timer Web App**
 
----
+Create a web application that allows users to:
 
-## 🧱 Project Structure
-
-```
-countdown-timer/
-├── backend/     → Spring Boot (Java 17)
-│   ├── Dockerfile
-│   ├── src/
-│   ├── pom.xml
-│   └── ...
-├── frontend/    → React + Vite + Axios
-│   ├── Dockerfile
-│   ├── src/
-│   ├── package.json
-│   └── ...
-└── docker-compose.yml
-```
+- Set a **counter name** and a **target date/time** for a countdown timer via the frontend.
+- Save this information to the backend and persist it in a database.
+- Once the timer is set and saved successfully, the frontend displays a live countdown (days, hours, minutes, seconds) until the target date/time.
+- The user should also be able to **update** or **reset** the countdown from the frontend.
 
 ---
 
-## 🚀 Tech Stack
+## Requirements
 
-| Layer            | Technology                                            |
-| :--------------- | :---------------------------------------------------- |
-| Frontend         | React, Vite, Axios, HTML5, CSS3                       |
-| Backend          | Spring Boot (Web, Validation, Data MongoDB, Actuator) |
-| Database         | MongoDB Atlas                                         |
-| Monitoring       | Spring Boot Actuator, Logs                            |
-| Containerization | Docker, Docker Compose                                |
-| Language         | Java 17, JavaScript (ES6)                             |
-
----
-
-## ⚙️ 1. Backend Setup (Spring Boot)
-
-### 🧩 Prerequisites
-
-- Java **17+**
-- Maven **3.8+**
-- MongoDB Atlas → [https://www.mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas)
+- **Frontend:** Use React (preferred) or any modern frontend framework.
+- **Backend:** Use Node.js (Express), Python (FastAPI/Django), or Java (Spring Boot).
+- **Database:** Persist the timer data (counter name, target date/time) using PostgreSQL, MongoDB, or SQLite/JSON file.
+- **API:** RESTful endpoints between frontend and backend.
+- **Input Validation:**
+  - **Counter name** must not be empty and should be a reasonable length (e.g., 2–32 characters).
+  - **Date/time** must be a valid future datetime.
+- **User Feedback:** Show clear error or success messages for actions.
+- **Responsiveness:** UI should be usable on desktop and mobile.
+- **README:** Provide clear run/setup instructions.
 
 ---
 
-### 🪣 Step 1: MongoDB Atlas Setup
+## Deliverables
 
-1. Create a **Free Cluster** in MongoDB Atlas
-2. Add a **Database User** (username/password)
-3. Go to **Network Access → Allow Access from Anywhere (`0.0.0.0/0`)**
-4. Copy your connection string (Driver → Java):
-
-   ```
-   mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority
-   ```
+- Source code (GitHub repo or zip)
+- Simple README with clear instructions to run both frontend and backend
 
 ---
 
-### ⚙️ Step 2: application.properties
+## Minimum Features
 
-```properties
-spring.application.name=timer
-server.port=8080
+### Frontend
 
-# MongoDB Atlas Connection
-spring.data.mongodb.uri=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?appName=timers
-spring.data.mongodb.database=timerdb
-spring.data.mongodb.auto-index-creation=true
+- Form to input **counter name** and **target date/time**
+- Button to **set/start** the countdown (saves to backend)
+- Button to **update** the countdown (edit and save new counter name or target date/time)
+- Button to **reset** the countdown (removes or resets timer on backend)
+- Display live countdown (days, hours, minutes, seconds) after setting
+- Show error or success messages for actions
 
-# Logging
-logging.level.root=INFO
-logging.level.com.user.timer=DEBUG
-logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
-logging.file.name=logs/app.log
-logging.file.max-size=10MB
-logging.file.total-size-cap=100MB
-logging.file.max-history=10
+### Backend
 
-# Actuator Monitoring
-management.endpoints.web.exposure.include=health,info,metrics,loggers,env
-management.endpoint.health.show-details=always
-management.endpoint.loggers.enabled=true
-```
+- `POST /timer` — Save a new timer (name + target date/time)
+- `GET /timer` — Get the current timer (name + target date/time)
+- `PUT /timer` — **Update** the timer (edit counter name or target date/time)
+- `DELETE /timer` — Reset/delete the timer
+
+- Persist data in a database
 
 ---
 
-### ⚙️ Step 3: Advanced Error Handling
+## Optional (Bonus)
 
-Implemented via:
-
-- `GlobalExceptionHandler` → Catches validation, DB, and generic errors
-- `ErrorResponse` → Returns structured JSON error messages
-- `RequestLoggingFilter` → Logs all API requests with timings
-- `Slf4j` → For structured log output
-
-✅ Example Error Response:
-
-```json
-{
-  "timestamp": "2025-11-07T12:35:00Z",
-  "status": 503,
-  "error": "Service Unavailable",
-  "message": "Database unavailable. Please try again later.",
-  "path": "/api/timer",
-  "traceId": "3acb74e9"
-}
-```
+- **Support multiple timers:** Allow user to create, view, and delete multiple named timers.
+- **JWT Authentication:** Secure timer endpoints.
+- **Monitoring & Logging:** Log timer changes, errors, API usage.
+- **Responsive UI:** Use Tailwind CSS or similar.
+- **Dockerize** the application.
+- **Advanced error handling:** Graceful handling of API/database failures.
 
 ---
 
-### ⚙️ Step 4: Monitoring via Actuator
+## Time Limit
 
-| Endpoint            | Description                    |
-| ------------------- | ------------------------------ |
-| `/actuator/health`  | Application and MongoDB health |
-| `/actuator/info`    | App metadata                   |
-| `/actuator/metrics` | Performance and memory metrics |
-| `/actuator/loggers` | Live logger configuration      |
-
-Example:
-
-```bash
-curl http://localhost:8080/actuator/health
-```
-
-Response:
-
-```json
-{
-  "status": "UP",
-  "components": {
-    "diskSpace": { "status": "UP" },
-    "mongo": { "status": "UP" }
-  }
-}
-```
+**1.5 hours**
 
 ---
 
-## 💻 2. Frontend Setup (React + Vite)
+## Evaluation Criteria
 
-### 🧩 Prerequisites
-
-- Node.js **18+**
-- npm or yarn
-
----
-
-### ⚙️ Step 1: Install
-
-```bash
-cd frontend
-npm install
-```
+- Functionality: Does the core workflow work?
+- Code quality: Clean, readable, and maintainable code
+- Proper API usage and frontend/backend separation
+- Input validation and user experience
+- Clear setup and run instructions
 
 ---
 
-### ⚙️ Step 2: Configure Backend URL
-
-📄 `src/services/api.js`
-
-```javascript
-// Local
-const API_BASE = "http://localhost:8080/api/timer";
-
-// Inside Docker
-// const API_BASE = "http://backend:8080/api/timer";
-```
-
----
-
-### ⚙️ Step 3: Global Error Handling (Axios)
-
-📄 `src/services/api.js`
-
-```javascript
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: "http://localhost:8080/api/timer",
-  timeout: 10000,
-  headers: { "Content-Type": "application/json" },
-});
-
-api.interceptors.response.use(
-  (res) => res,
-  (error) => {
-    if (!error.response) {
-      alert("Cannot reach server. Try again later.");
-    } else {
-      const { status, data } = error.response;
-      switch (status) {
-        case 400:
-          alert("Validation failed.");
-          break;
-        case 404:
-          alert(data.message || "Timer not found.");
-          break;
-        case 503:
-          alert("Database unavailable. Try again later.");
-          break;
-        default:
-          alert(data.message || "Unexpected error occurred.");
-      }
-    }
-    return Promise.reject(error);
-  }
-);
-
-export const getTimer = () => api.get("");
-export const createTimer = (data) => api.post("", data);
-export const updateTimer = (data) => api.put("", data);
-export const deleteTimer = () => api.delete("");
-
-export default api;
-```
-
----
-
-## 🐳 3. Docker Setup
-
-### 🧩 Backend Dockerfile
-
-📄 `backend/Dockerfile`
-
-```dockerfile
-FROM maven:3.9.5-eclipse-temurin-17 AS build
-WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN mvn clean package -DskipTests
-
-FROM eclipse-temurin:17-jdk-alpine
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
-```
-
----
-
-### 🧩 Frontend Dockerfile
-
-📄 `frontend/Dockerfile`
-
-```dockerfile
-FROM node:20-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-FROM nginx:alpine
-WORKDIR /usr/share/nginx/html
-COPY --from=build /app/dist .
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
----
-
-### 🧩 Docker Compose File
-
-📄 `docker-compose.yml`
-
-```yaml
-version: "3.9"
-
-services:
-  backend:
-    build: ./backend
-    container_name: countdown-backend
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/timerdb?retryWrites=true&w=majority
-      - SPRING_DATA_MONGODB_DATABASE=timerdb
-    networks:
-      - countdown-net
-
-  frontend:
-    build: ./frontend
-    container_name: countdown-frontend
-    ports:
-      - "5173:80"
-    depends_on:
-      - backend
-    networks:
-      - countdown-net
-
-networks:
-  countdown-net:
-    driver: bridge
-```
-
----
-
-### ▶️ Run the Application
-
-```bash
-docker-compose up --build
-```
-
-✅ Then open:
-
-- Frontend → [http://localhost:5173](http://localhost:5173)
-- Backend → [http://localhost:8080/api/timer](http://localhost:8080/api/timer)
-- Actuator → [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health)
-
----
-
-### 🧹 Stop & Cleanup
-
-```bash
-docker-compose down
-```
-
-To remove images & volumes:
-
-```bash
-docker-compose down --rmi all --volumes
-```
-
----
-
-## 📊 Monitoring & Logging
-
-- **Application Logs:**
-  → Stored in `backend/logs/app.log`
-- **API Requests:**
-  → Logged via `RequestLoggingFilter`
-- **Health Checks:**
-  → `GET /actuator/health`
-- **Metrics:**
-  → `GET /actuator/metrics`
-- **Error Tracking:**
-  → Structured JSON returned by `GlobalExceptionHandler`
-
----
-
-## 🧤 License
-
-This project is licensed under the **MIT License**.
-
----
-
-## 👨‍💻 Author
-
-**Aditya Shukla**
-_Full Stack Developer — Focused on efficiency, clean design, and practical architecture._
+**Good luck!**
