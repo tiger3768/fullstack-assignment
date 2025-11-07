@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 🧠 Create Axios instance with base URL
 const api = axios.create({
-  baseURL: "http://backend:8080/api/timer", // backend URL
+  baseURL: "http://localhost:8080/api/timer", // backend URL
   timeout: 10000, // 10s timeout
   headers: {
     "Content-Type": "application/json",
