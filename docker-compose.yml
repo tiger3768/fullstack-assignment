@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  backend:
+    build: ./backend
+    container_name: countdown-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb+srv://adityas3768_db_user:aJf3grXyaCNadqTu@timers.w2qjq2w.mongodb.net/?appName=timers
+      - SPRING_DATA_MONGODB_DATABASE=timerdb
+    networks:
+      - countdown-net
+
+  frontend:
+    build: ./frontend
+    container_name: countdown-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - countdown-net
+
+networks:
+  countdown-net:
+    driver: bridge

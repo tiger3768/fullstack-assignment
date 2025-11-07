@@ -23,8 +23,9 @@ const TimerForm = ({ onTimerSet }) => {
       setTargetDate(res.data.targetDate.substring(0, 16));
       setIsEditing(true);
       onTimerSet(res.data);
-    } catch {
-      setIsEditing(false);
+    } catch (error) {
+      console.error("Error fetching timer:", error);
+      // handled globally via interceptor
     }
   };
 
@@ -45,19 +46,15 @@ const TimerForm = ({ onTimerSet }) => {
     if (!validateInputs()) return;
 
     try {
-      const payload = {
-        name,
-        targetDate: new Date(targetDate).toISOString(),
-      };
-
+      const payload = { name, targetDate: new Date(targetDate).toISOString() };
       const res = isEditing
         ? await updateTimer(payload)
         : await createTimer(payload);
       setMessage("✅ Timer saved successfully!");
       onTimerSet(res.data);
       setIsEditing(true);
-    } catch (err) {
-      setMessage("❌ Failed to save timer.");
+    } catch (error) {
+      // handled globally
     }
   };
 
@@ -69,15 +66,14 @@ const TimerForm = ({ onTimerSet }) => {
       setTargetDate("");
       setIsEditing(false);
       onTimerSet(null);
-    } catch {
-      setMessage("❌ Failed to reset timer.");
+    } catch (error) {
+      // handled globally
     }
   };
 
   return (
     <div className="timer-form">
       <h2>{isEditing ? "Update Countdown Timer" : "Set Countdown Timer"}</h2>
-
       <form onSubmit={handleSubmit}>
         <label>Counter Name:</label>
         <input
@@ -87,7 +83,6 @@ const TimerForm = ({ onTimerSet }) => {
           onChange={(e) => setName(e.target.value)}
           required
         />
-
         <label>Target Date & Time:</label>
         <input
           type="datetime-local"
@@ -95,7 +90,6 @@ const TimerForm = ({ onTimerSet }) => {
           onChange={(e) => setTargetDate(e.target.value)}
           required
         />
-
         <div className="buttons">
           <button type="submit">{isEditing ? "Update" : "Start"}</button>
           {isEditing && (
@@ -105,7 +99,6 @@ const TimerForm = ({ onTimerSet }) => {
           )}
         </div>
       </form>
-
       {message && <p className="message">{message}</p>}
     </div>
   );
