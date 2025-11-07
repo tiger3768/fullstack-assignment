@@ -19,7 +19,7 @@ Create a web application that allows users to:
 - **Backend:** Use Node.js (Express), Python (FastAPI/Django), or Java (Spring Boot).
 - **Database:** Persist the timer data (counter name, target date/time) using PostgreSQL, MongoDB, or SQLite/JSON file.
 - **API:** RESTful endpoints between frontend and backend.
-- **Input Validation:**  
+- **Input Validation:**
   - **Counter name** must not be empty and should be a reasonable length (e.g., 2–32 characters).
   - **Date/time** must be a valid future datetime.
 - **User Feedback:** Show clear error or success messages for actions.
